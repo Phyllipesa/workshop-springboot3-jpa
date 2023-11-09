@@ -1,17 +1,28 @@
 package com.phyllipesa.course.resources;
 
 import com.phyllipesa.course.entities.User;
+import com.phyllipesa.course.services.UserService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/users")
 public class UseResource {
+  @Autowired
+  private UserService userService;
+
   @GetMapping
-  public ResponseEntity<User> findAll() {
-    User u = new User(1L, "Fepulio", "fepu@ex.com", "1245783", "seuclay");
+  public ResponseEntity<List<User>> findAll() {
+    List<User> list = userService.findAll();
+    return ResponseEntity.ok().body(list);
+  }
+
+  @GetMapping("/{id}")
+  public ResponseEntity<User> findById(@PathVariable Long id) {
+    User u = userService.findById(id);
     return ResponseEntity.ok().body(u);
   }
 }
