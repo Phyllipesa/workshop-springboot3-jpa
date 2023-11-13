@@ -2,8 +2,11 @@ package com.phyllipesa.course.services;
 
 import com.phyllipesa.course.entities.User;
 import com.phyllipesa.course.repositories.UserRepository;
+import com.phyllipesa.course.services.exception.DatabaseException;
 import com.phyllipesa.course.services.exception.ResourceNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -28,7 +31,18 @@ public class UserService {
   }
 
   public void delete(Long id) {
-    userRepository.deleteById(id);
+    try {
+      if(!userRepository.existsById(id)) {
+        throw new ResourceNotFoundException(id);
+      }
+      userRepository.deleteById(id);
+    }
+    catch (EmptyResultDataAccessException e) {
+      throw new ResourceNotFoundException(id);
+    }
+    catch (DataIntegrityViolationException e) {
+      throw new DatabaseException(e.getMessage());
+    }
   }
 
   public User update(Long id, User obj) {
