@@ -1,0 +1,39 @@
+version: '3.9'
+services:
+  db:
+    image: postgres:latest
+    container_name: db_ecommerce
+    restart: always
+    environment:
+      TZ: America/Sao_Paulo
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 1234567
+      POSTGRES_DB: ecommercedb
+    ports:
+      - "5432:5432"
+    networks:
+      - ecommerce-network
+
+  ecommerce-springboot3-jpa:
+    image: vaiento/ecommerce-springboot3-jpa
+    container_name: app_ecommerce
+    restart: always
+    build: .
+    working_dir: /workshop-springboot3-jpa
+    environment:
+      TZ: America/Sao_Paulo
+      SPRING.DATASOURCE.URL: jdbc:postgresql://db:5432/ecommercedb
+      SPRING.DATASOURCE.USERNAME: postgres
+      SPRING.DATASOURCE.PASSWORD: 1234567
+    ports:
+      - "80:80"
+    command: mvn spring-boot:run
+    depends_on:
+      - db
+    networks:
+      - ecommerce-network
+
+networks:
+  ecommerce-network:
+    name: ecommerce-network
+    driver: bridge
